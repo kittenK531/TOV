@@ -1,2 +1,3 @@
-result/
-__pycache__/
+**/__pycache__/
+**.DS_Store
+__pycache__/rk4.cpython-38.pyc

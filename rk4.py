@@ -1,4 +1,41 @@
+from pathlib import PurePath
+
+import matplotlib.pyplot as plt
 import numpy as np
+
+
+def plot_pic(
+    x,
+    y,
+    z,
+    label_1,
+    label_2,
+    title_1,
+    title_2,
+    filname_1,
+    filname_2,
+    foldername,
+    xlabel_1,
+    ylabel_1,
+    xlabel_2,
+    ylabel_2,
+):
+
+    plt.plot(x / 1000, y, label=rf"{label_1}", color="blue")
+    plt.title(rf"{title_1}")
+    plt.xlabel(rf"{xlabel_1}")
+    plt.ylabel(rf"{ylabel_1}")
+    plt.savefig(PurePath().joinpath(foldername, filname_1))
+    plt.show(block=False)
+    plt.close()
+
+    plt.plot(x / 1000, z / 1.989e30, label=rf"{label_2}", color="blue")
+    plt.title(rf"{title_2}")
+    plt.xlabel(rf"{xlabel_2}")
+    plt.ylabel(rf"{ylabel_2}")
+    plt.savefig(PurePath().joinpath(foldername, filname_2))
+    plt.show(block=False)
+    plt.close()
 
 
 class associated_ODE:
@@ -77,4 +114,38 @@ class associated_ODE:
 
             x[i + 1] = x[i] + self.h
 
-        print(x, y, z)
+        # print(x, y, z)
+        print(f"radius: {x / 1000}\npressure: {y}\nmass: {z}")
+
+        plot_pic(
+            x,
+            y,
+            z,
+            "$P(r)$",
+            "$m(r)$",
+            "pressure $p$ against $r$",
+            "mass $m$ against $r$",
+            "p(r).png",
+            "m(r).png",
+            "result",
+        )
+
+
+""" ode RK4"""
+
+
+def ode_RK4(f, X_0, a, dt, T):
+    N_t = int(round((T - a) / dt))
+    # Initial conditions
+    usol = X_0
+    u = np.copy(X_0)
+
+    tt = np.linspace(a, N_t * dt, N_t + 1)
+    # RK4
+    for t in tt[:-1]:
+        u1 = f(u + 0.5 * dt * f(u, t), t + 0.5 * dt)
+        u2 = f(u + 0.5 * dt * u1, t + 0.5 * dt)
+        u3 = f(u + dt * u2, t + dt)
+        u = u + (1 / 6) * dt * (f(u, t) + 2 * u1 + 2 * u2 + u3)
+        usol = np.vstack((usol, u))
+    return usol, tt
